@@ -68,3 +68,36 @@ RuleLibary.prototype.get = function(rules) {
 
 	return returnValue;
 };
+
+var RulesEngine = function () {
+	//Singleton pattern
+	if ( arguments.callee.instance ) {
+		return arguments.callee.instance;
+    }
+    arguments.callee.instance = this;
+
+    this.rules = RuleLibary.getInstance();
+}
+
+RulesEngine.getInstance = function() {
+    var singletonClass = new RulesEngine();
+    return singletonClass;
+};   
+
+RulesEngine.prototype.run = function(rules) {
+	var ruleSet = {};
+	rules = (typeof rules === 'string') ? [rules] : rules;
+
+	if (rules instanceof Array && rules.length > 0) {
+		ruleSet = this.rules.get(rules);
+
+		for (var rulesIndex = 0; rulesIndex < rules.length; rulesIndex++) {
+			var ruleKey = rules[rulesIndex];
+
+			if (typeof ruleSet[ruleKey] === 'function') {
+				ruleSet[ruleKey]();
+			}			
+		}
+
+	}
+};

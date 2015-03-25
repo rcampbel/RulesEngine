@@ -11,10 +11,12 @@ describe('RulesEngine', function() {
 
 	describe("contains", function() {
 
-		var ruleEngine = null;
+		var ruleEngine = null,
+			ruleLibary = null;
 
 		beforeEach(function() {
 			ruleEngine = new RulesEngine();
+			ruleLibary = new RuleLibary();
 		});
 
 		describe('getInstance', function() {
@@ -31,6 +33,69 @@ describe('RulesEngine', function() {
 			});
 		});
 
+		describe('run', function() {
+			
+			it('which is defined', function() {
+				expect(ruleEngine.run).toBeDefined();
+			});
+
+			it('which is a function', function() {
+				expect(ruleEngine.run).toEqual(jasmine.any(Function));
+			});
+
+			it('which calls the RuleLibary to get a list of rules', function() {
+				spyOn(ruleLibary, 'get').and.returnValue({
+					'required' : function() {}	
+				});
+				ruleEngine.run('required');
+				expect(ruleLibary.get).toHaveBeenCalled();
+			});
+
+			it('which calls the RuleLibary to get the rule passed in', function() {
+				spyOn(ruleLibary, 'get').and.returnValue({
+					'required' : function() {}	
+				});
+				ruleEngine.run('required');
+				expect(ruleLibary.get).toHaveBeenCalledWith(['required']);
+			});
+
+			it('which calls the RuleLibary to get the rules passed in', function() {
+				spyOn(ruleLibary, 'get').and.returnValue({
+					'required' : function() {}	
+				});
+				ruleEngine.run(['required', 'filtered']);
+				expect(ruleLibary.get).toHaveBeenCalledWith(['required', 'filtered']);
+			});
+
+			it('which does not call the RuleLibary when no rules have been passed in', function() {
+				spyOn(ruleLibary, 'get').and.returnValue({
+					'required' : function() {}	
+				});
+				ruleEngine.run();
+				expect(ruleLibary.get).not.toHaveBeenCalled();
+			});
+
+			it('which does not call the RuleLibary when an empty list of rules have been passed in', function() {
+				spyOn(ruleLibary, 'get').and.returnValue({
+					'required' : function() {}	
+				});
+				ruleEngine.run([]);
+				expect(ruleLibary.get).not.toHaveBeenCalled();
+			});
+
+			it('which executes the each of the rules returned by the RuleLibary', function() {
+				var ruleLibarySpies = {
+					'required': jasmine.createSpy('Rule 1'),
+					'filtered': jasmine.createSpy('Rule 2')
+				}
+
+				spyOn(ruleLibary, 'get').and.returnValue(ruleLibarySpies);
+				ruleEngine.run(["required", "filtered"]);
+
+				expect(ruleLibarySpies.required).toHaveBeenCalled();
+				expect(ruleLibarySpies.filtered).toHaveBeenCalled();
+			});
+		});
 	});
 });
 
