@@ -29,7 +29,7 @@ module.exports = function(config) {
 
             coverageReporter: {
                 type: 'html',
-                dir: 'unitTest/checkout/coverage/'
+                dir: 'build/coverage/'
             },
 
             // web server port
